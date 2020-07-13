@@ -14,6 +14,10 @@ from data_loader import Generator
 import time
 from parameters import Parameters
 import util
+import glob
+import os
+
+from sklearn import linear_model, datasets
 
 p = Parameters()
 
@@ -55,14 +59,27 @@ def Testing():
 
     if p.mode == 0 : # check model with test data 
         for _, _, _, test_image in loader.Generate():
+            t1 = time.time()
             _, _, ti = test(lane_agent, np.array([test_image]))
+            t2 = time.time()
+            # print("test takes {0}".format(t2-t1))
             cv2.imshow("test", ti[0])
-            cv2.waitKey(0) 
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
     elif p.mode == 1: # check model with video
-        cap = cv2.VideoCapture("video_path")
+        frame_count = 0
+        # cap = cv2.VideoCapture("/home/inseo/catkin_ws/src/aeye4s/src/e2e_lane/2020-02-05-17-08-38.avi")
+        cap = cv2.VideoCapture("/home/inseo/Desktop/PINet/2020-02-05-17-08-38.avi")
+        # cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
+        
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        out = cv2.VideoWriter('demo3.avi', fourcc, 30, (512, 256))
+
         while(cap.isOpened()):
             ret, frame = cap.read()
+            if not ret:
+                break
             prevTime = time.time()
             frame = cv2.resize(frame, (512,256))/255.0
             frame = np.rollaxis(frame, axis=2, start=0)
@@ -71,20 +88,43 @@ def Testing():
             sec = curTime - prevTime
             fps = 1/(sec)
             s = "FPS : "+ str(fps)
-            cv2.putText(ti[0], s, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
-            cv2.imshow('frame',ti[0])
+            # cv2.putText(ti[0], s, (0, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0))
+            # cv2.line(ti[0], (0, 128), (512, 128), (0, 0, 255), thickness=1) # horizontal 
+            # cv2.line(ti[0], (0, 142), (512, 142), (0, 0, 255), thickness=1)
+
+            # cv2.line(ti[0], (128, 0), (128, 255), (0, 0, 255), thickness=1) # vertical
+            # cv2.line(ti[0], (256, 0), (256, 255), (0, 0, 255), thickness=1)
+            # cv2.line(ti[0], (384, 0), (384, 255), (0, 0, 255), thickness=1)
+            
+            cv2.imshow('result',ti[0])
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            
+            # cv2.imwrite(os.path.join('/home/inseo/Desktop/PINet/49/ransac/',str(frame_count)+'.png'), ti[0])
+            frame_count += 1
+
+            out.write(ti[0])
+
+        out.release()
+
         cap.release()
         cv2.destroyAllWindows()
 
     elif p.mode == 2: # check model with a picture
-        test_image = cv2.imread(p.test_root_url+"clips/0530/1492720840345996040_0/20.jpg")
-        test_image = cv2.resize(test_image, (512,256))/255.0
-        test_image = np.rollaxis(test_image, axis=2, start=0)
-        _, _, ti = test(lane_agent, np.array([test_image]))
-        cv2.imshow("test", ti[0])
-        cv2.waitKey(0)   
+        test_image_list = glob.glob(os.path.join(p.test_root_url+"inha/*.jpg"))
+        for test_image_file in test_image_list:
+            
+            test_image = cv2.imread(test_image_file)
+            t_a = time.time()
+            test_image = cv2.resize(test_image, (512,256))/255.0
+            test_image = np.rollaxis(test_image, axis=2, start=0)
+            _, _, ti = test(lane_agent, np.array([test_image]))
+            t_b = time.time()
+            print("{0} s".format(t_b-t_a))
+            cv2.imwrite(os.path.join("result_no_post", os.path.basename(test_image_file)), ti[0])
+            # cv2.imshow("test", ti[0])
+            # if cv2.waitKey(0) & 0xFF == ord('q'):
+            #     break
 
     elif p.mode == 3: #evaluation
         print("evaluate")
@@ -189,6 +229,9 @@ def test(lane_agent, test_images, thresh = p.threshold_point):
         image =  np.rollaxis(image, axis=2, start=0)*255.0
         image = image.astype(np.uint8).copy()
 
+        # cv2.imshow("original", image)
+        # cv2.waitKey(1)
+
         confidence = confidences[i].view(p.grid_y, p.grid_x).cpu().data.numpy()
 
         offset = offsets[i].cpu().data.numpy()
@@ -202,19 +245,34 @@ def test(lane_agent, test_images, thresh = p.threshold_point):
         # generate point and cluster
         raw_x, raw_y = generate_result(confidence, offset, instance, thresh)
 
+        t_a = time.time()
+
         # eliminate fewer points
-        in_x, in_y = eliminate_fewer_points(raw_x, raw_y)
+        # in_x, in_y = eliminate_fewer_points(raw_x, raw_y)
                 
-        # sort points along y 
-        in_x, in_y = util.sort_along_y(in_x, in_y)  
-        in_x, in_y = eliminate_out(in_x, in_y, confidence, deepcopy(image))
-        in_x, in_y = util.sort_along_y(in_x, in_y)
-        in_x, in_y = eliminate_fewer_points(in_x, in_y)
+        # # sort points along y 
+        # in_x, in_y = util.sort_along_y(in_x, in_y)  
+        # in_x, in_y = eliminate_out(in_x, in_y, confidence, deepcopy(image))
+        # in_x, in_y = util.sort_along_y(in_x, in_y)
+        # in_x, in_y = eliminate_fewer_points(in_x, in_y)
+        
 
-        result_image = util.draw_points(in_x, in_y, deepcopy(image))
+        t_b = time.time()
+        # print("{0} s - post processing".format(t_b-t_a))
 
-        out_x.append(in_x)
-        out_y.append(in_y)
+        result_image = util.draw_points(raw_x, raw_y, deepcopy(image))
+        
+        # cv2.imshow("points", result_image)
+        # cv2.waitKey(1)
+
+        # apply ransac
+        for i in range(len(raw_x)):
+            p_ymin, p_ymax = ransac(raw_x[i], raw_y[i])
+            if p_ymax is not None:
+                cv2.line(result_image, p_ymin, p_ymax, (0, 0, 255), thickness=2)
+
+        out_x.append(raw_x)
+        out_y.append(raw_y)
         out_images.append(result_image)
 
     return out_x, out_y,  out_images
@@ -356,6 +414,13 @@ def generate_result(confidance, offsets,instance, thresh):
             point_y = int((offset[i][1]+grid[i][1])*p.resize_ratio)
             if point_x > p.x_size or point_x < 0 or point_y > p.y_size or point_y < 0:
                 continue
+            
+            if point_x > 384 or point_x < 128:
+                continue
+
+            if point_y < 128:
+                continue
+
             if len(lane_feature) == 0:
                 lane_feature.append(feature[i])
                 x.append([])
@@ -383,6 +448,25 @@ def generate_result(confidance, offsets,instance, thresh):
                     y[index].append(point_y)
                 
     return x, y
+
+############################################################################
+## ransac for remove outlier
+############################################################################
+def ransac(pointsX, pointsY):
+    pointsY = np.reshape(pointsY, (-1, 1))
+    rs = linear_model.RANSACRegressor(max_trials=1)
+    try:
+        rs.fit(pointsY, pointsX) # fit y to x!
+    except ValueError:
+        return None, None
+    
+    # y_minmax = np.reshape([np.amin(pointsY), np.amax(pointsY)], (-1,1))
+    # predicted = rs.predict(y_minmax)
+
+    y_minmax = np.array([[128],[255]]) # 0~128
+    predicted = rs.predict(y_minmax)
+
+    return [(int(predicted[0]), y_minmax[0][0]), (int(predicted[1]), y_minmax[1][0])]
 
 if __name__ == '__main__':
     Testing()
