@@ -47,13 +47,13 @@ class Generator(object):
         self.train_data_three = []
         self.train_data_two = []
 
-        with open("dataset/five.json") as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data_five.append(jsonString)
+        # with open("dataset/five.json") as f:
+        #     while True:
+        #         line = f.readline()
+        #         if not line:
+        #             break
+        #         jsonString = json.loads(line)
+        #         self.train_data_five.append(jsonString)
 
         with open("dataset/four.json") as f:
             while True:
@@ -136,9 +136,9 @@ class Generator(object):
         # choose data from each number of lanes
         for _ in range(start, end):
             choose = random.random()
-            if 0.8 <= choose:
-                data = random.sample(self.train_data_five, 1)[0]
-            elif 0.3 <= choose < 0.8:
+            while choose >= 0.8:
+                choose = random.random()
+            if 0.3 <= choose < 0.8:
                 data = random.sample(self.train_data_four, 1)[0]
             elif 0.05 <= choose < 0.3:
                 data = random.sample(self.train_data_three, 1)[0]

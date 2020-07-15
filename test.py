@@ -39,7 +39,7 @@ def Testing():
         lane_agent = agent.Agent()
     else:
         lane_agent = agent.Agent()
-        lane_agent.load_weights(640, "tensor(0.2298)")
+        lane_agent.load_weights(950, "tensor(0.1237)")
     ##############################
     ## Check GPU
     ##############################
@@ -79,7 +79,8 @@ def Testing():
         cv2.destroyAllWindows()
 
     elif p.mode == 2: # check model with a picture
-        test_image = cv2.imread(p.test_root_url+"clips/0530/1492720840345996040_0/20.jpg")
+        root_url = "/home/inseo/Desktop/result/"
+        test_image = cv2.imread("/home/inseo/Desktop/result/default/2020_02_28_000864.png")
         test_image = cv2.resize(test_image, (512,256))/255.0
         test_image = np.rollaxis(test_image, axis=2, start=0)
         _, _, ti = test(lane_agent, np.array([test_image]))

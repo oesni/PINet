@@ -28,7 +28,7 @@ class Generator(object):
         self.train_data = []
         self.test_data = []
 
-        with open(self.p.train_root_url+'label_data_0313.json') as f:
+        with open(self.p.train_root_url+'label_data_all.json') as f:
             while True:
                 line = f.readline()
                 if not line:
@@ -38,25 +38,25 @@ class Generator(object):
         
         random.shuffle(self.train_data)
 
-        with open(self.p.train_root_url+'label_data_0531.json') as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data.append(jsonString)
+        # with open(self.p.train_root_url+'label_data_0531.json') as f:
+        #     while True:
+        #         line = f.readline()
+        #         if not line:
+        #             break
+        #         jsonString = json.loads(line)
+        #         self.train_data.append(jsonString)
 
-        random.shuffle(self.train_data)
+        # random.shuffle(self.train_data)
 
-        with open(self.p.train_root_url+'label_data_0601.json') as f:
-            while True:
-                line = f.readline()
-                if not line:
-                    break
-                jsonString = json.loads(line)
-                self.train_data.append(jsonString)
+        # with open(self.p.train_root_url+'label_data_0601.json') as f:
+        #     while True:
+        #         line = f.readline()
+        #         if not line:
+        #             break
+        #         jsonString = json.loads(line)
+        #         self.train_data.append(jsonString)
 
-        random.shuffle(self.train_data)
+        # random.shuffle(self.train_data)
 
         self.size_train = len(self.train_data)
         print(self.size_train)
