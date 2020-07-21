@@ -176,7 +176,8 @@ class resize_layer(nn.Module):
         self.maxpool = nn.MaxPool2d(2, 2)
         self.re1 = bottleneck(out_channels//2, out_channels//2)
         self.re2 = bottleneck(out_channels//2, out_channels//2)
-        self.re3 = bottleneck(out_channels//2, out_channels)
+        self.re3 = bottleneck(out_channels//2, out_channels//2)
+        self.re4 = bottleneck(out_channels//2, out_channels)
 
     def forward(self, inputs):
         outputs = self.conv(inputs)
@@ -185,6 +186,8 @@ class resize_layer(nn.Module):
         outputs = self.re2(outputs)
         outputs = self.maxpool(outputs)
         outputs = self.re3(outputs)
+        outputs = self.maxpool(outputs)
+        outputs = self.re4(outputs)
 
         return outputs   
 

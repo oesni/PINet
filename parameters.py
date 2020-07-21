@@ -10,11 +10,11 @@ class Parameters():
     l_rate = 0.0001
     weight_decay=0
     save_path = "savefile/"
-    model_path = "savefile/"
+    model_path = ""
     batch_size = 8
     x_size = 512
     y_size = 256
-    resize_ratio = 8
+    resize_ratio = 16
     grid_x = x_size/resize_ratio  #64
     grid_y = y_size/resize_ratio  #32
     feature_size = 4
