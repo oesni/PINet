@@ -57,7 +57,8 @@ def Testing():
         for _, _, _, test_image in loader.Generate():
             _, _, ti = test(lane_agent, np.array([test_image]))
             cv2.imshow("test", ti[0])
-            cv2.waitKey(0) 
+            if cv2.waitKey(0) & 0xFF == ord('q'):
+                break
 
     elif p.mode == 1: # check model with video
         cap = cv2.VideoCapture("video_path")
