@@ -6,11 +6,11 @@
 import numpy as np
 
 class Parameters():
-    n_epoch = 1000
+    n_epoch = 10000
     l_rate = 0.0001
     weight_decay=0
     save_path = "savefile/"
-    model_path = ""
+    model_path = "savefile/"
     batch_size = 8
     x_size = 512
     y_size = 256
@@ -19,7 +19,7 @@ class Parameters():
     grid_y = y_size/resize_ratio  #32
     feature_size = 4
     regression_size = 110
-    mode = 2
+    mode = 0
     threshold_point = 0.81
     threshold_instance = 0.22
 

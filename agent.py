@@ -31,7 +31,7 @@ class Agent(nn.Module):
 
         self.p = Parameters()
 
-        self.lane_detection_network = lane_detection_network()
+        self.lane_detection_network = nn.DataParallel(lane_detection_network())
 
         self.setup_optimizer()
 
