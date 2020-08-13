@@ -287,10 +287,12 @@ class Agent(nn.Module):
     #####################################################
     ## Load save file
     #####################################################
-    def load_weights(self, epoch, loss):
-        self.lane_detection_network.load_state_dict(
-            torch.load(self.p.model_path+str(epoch)+'_'+str(loss)+'_'+'lane_detection_network.pkl'),False
-        )
+    def load_weights(self, epoch, loss, single_gpu=False):
+        weights = torch.load(self.p.model_path+str(epoch)+'_'+str(loss)+'_'+'lane_detection_network.pkl')
+        if single_gpu:
+            weights = {k.split("module.")[-1]:v for k,v in weights.items()}
+
+        self.lane_detection_network.load_state_dict(weights, False)
 
     #####################################################
     ## Save model

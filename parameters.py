@@ -10,13 +10,13 @@ class Parameters():
     l_rate = 0.0001
     weight_decay=0
     save_path = "savefile/"
-    model_path = "savefile/"
+    model_path = "savefile/inha_crop/"
     batch_size = 8
     x_size = 512
     y_size = 256
     resize_ratio = 16
-    grid_x = x_size/resize_ratio  #64
-    grid_y = y_size/resize_ratio  #32
+    grid_x = int(x_size/resize_ratio)  #64
+    grid_y = int(y_size/resize_ratio)  #32
     feature_size = 4
     regression_size = 110
     mode = 0
@@ -48,14 +48,14 @@ class Parameters():
     shadow_ratio=0.6
     scaling_ratio=0.2
     
-    train_root_url="/home/inseo/LANE/lane_project/dataset/inha/autocar_tuSimple/train_set/"
-    test_root_url="/home/inseo/LANE/lane_project/dataset/inha/autocar_tuSimple/test_set/"
+    train_root_url="/home/inseo/DATA/LANE/dataset/inha/autocar_tuSimple/train_set/"
+    test_root_url="/home/inseo/DATA/LANE/dataset/inha/autocar_tuSimple/test_set/"
 
     # test parameter
     color = [(0,0,0), (255,0,0), (0,255,0),(0,0,255),(255,255,0),(255,0,255),(0,255,255),(255,255,255),(100,255,0),(100,0,255),(255,100,0),(0,100,255),(255,0,100),(0,255,100)]
-    grid_location = np.zeros((grid_y, grid_x, 2))
-    for y in range(grid_y):
-        for x in range(grid_x):
+    grid_location = np.zeros((int(grid_y), int(grid_x), 2))
+    for y in range(int(grid_y)):
+        for x in range(int(grid_x)):
             grid_location[y][x][0] = x
             grid_location[y][x][1] = y
     num_iter = 30
