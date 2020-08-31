@@ -242,9 +242,9 @@ class Agent(nn.Module):
             self.current_epoch = epoch
             if epoch>0 and (epoch == 1000):
                 self.p.constant_lane_loss += 0.5
-		self.p.constant_nonexist += 0.5
-	        self.p.l_rate /= 2.0
-	        self.setup_optimizer()
+                self.p.constant_nonexist += 0.5
+                self.p.l_rate /= 2.0
+                self.setup_optimizer()
 
         return lane_detection_loss
 

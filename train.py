@@ -51,7 +51,7 @@ def Training():
         lane_agent = agent.Agent()
     else:
         lane_agent = agent.Agent()
-        lane_agent.load_weights(640, "tensor(0.2298)")
+        lane_agent.load_weights(2491, "tensor(0.1428)")
 
     ##############################
     ## Check GPU
@@ -91,7 +91,7 @@ def Training():
         if epoch > 0 and epoch%10 == 0:
             print("evaluation")
             lane_agent.evaluate_mode()
-            th_list = [0.3, 0.5, 0.7]
+            th_list = [p.threshold_point]
             lane_agent.save_model(int(step/100), loss_p)
 
             for th in th_list:
